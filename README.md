@@ -22,9 +22,9 @@ conda activate depth-pro
 pip install -e .
 ```
 
-Install h5py
+Install related package
 ```
-pip install h5py
+pip install h5py joblib
 ```
 
 To download pretrained checkpoints follow the code snippet below:
