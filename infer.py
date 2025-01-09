@@ -85,6 +85,8 @@ os.makedirs(save_root, exist_ok=True)
 cnt = 0
 elapse_time = 0.0
 for id, data in enumerate(dataset):
+    if id % 10 == 0:
+        print(f"Processing {id + 1}/{len(dataset)}")
     image = data[0]
     # depth = data[1]
     image = image.unsqueeze(0).to(device)
