@@ -90,7 +90,22 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
     return save_path
 
 
-def process_file(file_path, dsize=(720, 1280)):
+def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
+    with open(filepath, 'rb') as file:
+        depthBuf = file.read()
+    depth = np.frombuffer(depthBuf, dtype=np.float32)
+    image = np.reshape(depth, dsize, 'C')
+    f = 10003.814
+    n = 0.15
+    numerator = (-f * n)
+    denominator = (((n - f) * image) - n)
+    cv2.imwrite(os.path.join(os.path.split(filepath)[0], os.path.split(filepath)[1].split('-')[0] + "DepthReal.pfm"),
+                numerator / denominator)
+    cv2.imwrite(
+        os.path.join(os.path.split(filepath)[0], os.path.split(filepath)[1].split('-')[0] + "DepthRelative.pfm"), image)
+
+
+def process_img(file_path, dsize=(720, 1280)):
     """
     Process a single .raw file to convert it to PNG.
 
@@ -120,17 +135,23 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
     Returns:
         list: List of paths to the converted PNG files.
     """
-    raw_files = []
-
+    raw_img_files = []
+    raw_depth_files = []
     # Collect all .raw files
     for root, _, files in os.walk(data_root):
         for file in files:
             if file.endswith('.raw'):
-                raw_files.append(os.path.join(root, file))
+                if 'color' in file:
+                    raw_img_files.append(os.path.join(root, file))
+                elif 'depth' in file:
+                    raw_depth_files.append(os.path.join(root, file))
 
     # Use joblib for parallel processing
     results = Parallel(n_jobs=n_jobs)(
-        delayed(process_file)(file_path, dsize) for file_path in raw_files
+        delayed(process_img)(file_path, dsize) for file_path in raw_img_files
+    )
+    Parallel(n_jobs=n_jobs)(
+        delayed(convertDepthRAW2PNG)(file_path, dsize) for file_path in raw_depth_files
     )
 
     # Filter out None values
