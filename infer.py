@@ -87,7 +87,7 @@ elapse_time = 0.0
 for id, data in enumerate(dataset):
     if id % 10 == 0:
         print(f"Processing {id + 1}/{len(dataset)}")
-    image = data[0]
+    image = data
     # depth = data[1]
     image = image.unsqueeze(0).to(device)
     h, w = image.shape[-2:]
