@@ -99,8 +99,10 @@ if __name__ == "__main__":
     dataset = SYN_AM2KDataset()
     print(f"Dataset length: {len(dataset)}")
 
+    os.makedirs('./vis/syn_am2k', exist_ok=True)
     for id, data in enumerate(dataset):
         image, dav2_depth, depth_pro_depth = data
+
         save_image(image, f'./vis/syn_am2k/{id}_image.png')
         save_image(dav2_depth, f'./vis/syn_am2k/{id}_dav2_depth.png')
         save_image(depth_pro_depth, f'./vis/syn_am2k/{id}_depth_pro_depth.png')
