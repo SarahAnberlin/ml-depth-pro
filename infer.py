@@ -87,6 +87,10 @@ elapse_time = 0.0
 for id, data in enumerate(dataset):
     if id % 10 == 0:
         print(f"Processing {id + 1}/{len(dataset)}")
+    next_save_path = os.path.join(save_root, f"{id + 2}.png")
+    if os.path.exists(next_save_path):
+        print(f"Skipping {id + 1}")
+        continue
     image = data
     # depth = data[1]
     image = image.unsqueeze(0).to(device)
