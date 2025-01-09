@@ -91,6 +91,7 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
 
 
 def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
+    print(f"Processing {filepath}")
     with open(filepath, 'rb') as file:
         depthBuf = file.read()
     depth = np.frombuffer(depthBuf, dtype=np.float32)
