@@ -76,9 +76,9 @@ def get_dataset(dataset_name):
         return AM2KDataset()
 
 
-dataset_name = "Sintel"
+# dataset_name = "Sintel"
 # dataset_name = "Hypersim"
-# dataset_name = "AM2K"
+dataset_name = "AM2K"
 dataset = get_dataset(dataset_name)
 save_root = os.path.join('./vis/depth-pro-test-large', dataset_name)
 os.makedirs(save_root, exist_ok=True)
@@ -94,7 +94,7 @@ for id, data in enumerate(dataset):
     # Run inference.
     with torch.no_grad():
         prediction, _ = model(image * 2 - 1, test=True)
-
+    prediction = torchvision.transforms.Resize((h, w), interpolation=InterpolationMode.BILINEAR)(prediction)
     depth = prediction
     depth = depth.squeeze()
     save_image(depth, os.path.join(save_root, f"{id + 1}.png"))
