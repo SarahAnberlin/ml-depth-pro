@@ -14,6 +14,7 @@ from dataset.utils import get_hdf5_array
 import cv2
 from torchvision.utils import save_image
 import rawpy
+from joblib import Parallel, delayed
 
 meta_json = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/GTA/meta_data.json'
 data_root = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/GTA/'
@@ -81,23 +82,22 @@ def process_file(file_path):
     return None
 
 
-def get_meta(meta_json, data_root):
-    image_list = []
+def get_meta(meta_json, data_root, n_jobs=-1):
     raw_files = []
 
-    # Collect all .raw files
+    # 收集所有 .raw 文件路径
     for root, _, files in os.walk(data_root):
         for file in files:
             if file.endswith('.raw'):
                 raw_files.append(os.path.join(root, file))
 
-    # Process files in parallel
-    with ThreadPoolExecutor() as executor:
-        futures = [executor.submit(process_file, file_path) for file_path in raw_files]
-        for future in futures:
-            result = future.result()
-            if result:
-                image_list.append(result)
+    # 使用 joblib 并行处理
+    results = Parallel(n_jobs=n_jobs)(
+        delayed(process_file)(file_path) for file_path in raw_files
+    )
+
+    # 过滤掉 None 值
+    image_list = [result for result in results if result is not None]
 
     with open(meta_json, 'w') as f:
         cnt = 0
