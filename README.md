@@ -24,7 +24,7 @@ pip install -e .
 
 Install related package
 ```
-pip install h5py joblib
+pip install h5py joblib rawpy
 ```
 
 To download pretrained checkpoints follow the code snippet below:
