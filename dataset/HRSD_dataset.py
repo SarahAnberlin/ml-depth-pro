@@ -145,7 +145,7 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
                     raw_img_files.append(os.path.join(root, file))
                 elif 'depth' in file:
                     raw_depth_files.append(os.path.join(root, file))
-
+    print(f"Total images: {len(raw_img_files)} | Total depth: {len(raw_depth_files)}")
     # Use joblib for parallel processing
     results = Parallel(n_jobs=n_jobs)(
         delayed(process_img)(file_path, dsize) for file_path in raw_img_files
