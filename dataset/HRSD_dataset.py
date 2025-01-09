@@ -141,9 +141,9 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
     for root, _, files in os.walk(data_root):
         for file in files:
             if file.endswith('.raw'):
-                if 'color' in file:
+                if 'color.raw' in file:
                     raw_img_files.append(os.path.join(root, file))
-                elif 'depth' in file:
+                elif 'depth.raw' in file:
                     raw_depth_files.append(os.path.join(root, file))
     print(f"Total images: {len(raw_img_files)} | Total depth: {len(raw_depth_files)}")
     # Use joblib for parallel processing
