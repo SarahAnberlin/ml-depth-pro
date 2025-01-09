@@ -1,6 +1,8 @@
 import json
 import os
 import pickle
+from concurrent.futures import ThreadPoolExecutor
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -57,12 +59,11 @@ class HRSD_Dataset(BaseDataset):
         if isinstance(idx, list):
             return [self.__getitem__(i) for i in idx]
         image_np = self.preproess_img(self.image_paths[idx])
-
+        depth_np = self.preprocess_depth(self.depth_paths[idx])
         to_tensor = transforms.ToTensor()
         image = to_tensor(image_np)
-        dav2_depth = to_tensor(dav2_depth)
-        depth_pro_depth = to_tensor(depth_pro_depth)
-        return image, dav2_depth, depth_pro_depth
+        depth = to_tensor(depth_np)
+        return image, depth
 
 
 def transfer_raw_to_png(raw_path):
@@ -70,27 +71,47 @@ def transfer_raw_to_png(raw_path):
     rgb = raw.postprocess()
     save_path = raw_path.replace('.raw', '.png')
     cv2.imwrite(save_path, cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
+    return save_path
 
 
-def get_meta(meta_json):
-    json_list = []
-    with open(meta_json, 'r') as f:
-        for line in f:
-            data = json.loads(line)
-            image_path = data['img_path']
-            id = data['id']
-            dav2_path = os.path.join(data_root, 'AM2K-dav2', f'{id}.png')
-            depth_pro_path = os.path.join(data_root, 'AM2K-depthpro', f'{id}.png')
-            json_list.append({
-                'id': id,
-                'img_path': image_path,
-                'dav2_path': dav2_path,
-                'depth_pro_path': depth_pro_path,
-            })
+def process_file(file_path):
+    save_path = transfer_raw_to_png(file_path)
+    if '-color' in save_path:
+        return save_path
+    return None
+
+
+def get_meta(meta_json, data_root):
+    image_list = []
+    raw_files = []
+
+    # Collect all .raw files
+    for root, _, files in os.walk(data_root):
+        for file in files:
+            if file.endswith('.raw'):
+                raw_files.append(os.path.join(root, file))
+
+    # Process files in parallel
+    with ThreadPoolExecutor() as executor:
+        futures = [executor.submit(process_file, file_path) for file_path in raw_files]
+        for future in futures:
+            result = future.result()
+            if result:
+                image_list.append(result)
 
     with open(meta_json, 'w') as f:
-        for entry in json_list:
-            json.dump(entry, f)
+        cnt = 0
+        for image_path in image_list:
+            cnt += 1
+            type = 'train'
+            if 'validation' in image_path:
+                type = 'validation'
+            json.dump({
+                'id': cnt,
+                'type': type,
+                'img_path': image_path,
+                'depth_path': image_path.replace('-color', '-depth')
+            }, f)
             f.write('\n')
 
 
