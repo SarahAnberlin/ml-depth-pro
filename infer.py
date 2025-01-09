@@ -1,3 +1,6 @@
+from torchvision.utils import save_image
+# import interpolation mode
+from torchvision.transforms import InterpolationMode
 import json
 import os
 import time
@@ -85,36 +88,13 @@ for id, data in enumerate(dataset):
     image = data[0]
     # depth = data[1]
     image = image.unsqueeze(0).to(device)
-    image = torchvision.transforms.Resize((1536, 1536))(image)
-    image_numpy = image.squeeze(0).cpu().numpy().transpose(1, 2, 0)
-
-    # print(f"Image range: {np.min(image_numpy), np.max(image_numpy)}")
+    h, w = image.shape[-2:]
+    image = torchvision.transforms.Resize((1536, 1536), interpolation=InterpolationMode.BICUBIC)(image)
 
     # Run inference.
-    consume_time = 0
     with torch.no_grad():
-        if torch.cuda.is_available():
-            torch.cuda.synchronize()
-        begin_time = time.time()
-        prediction, fov = model(image * 2 - 1, test=True)
-        if torch.cuda.is_available():
-            torch.cuda.synchronize()
-        consume_time = time.time() - begin_time
-    elapse_time += consume_time
-    cnt += 1
-    if cnt % 20 == 0:
-        print(f"Avg time for {cnt} images: {elapse_time / cnt}")
-    # print(f"prediction shape: {prediction.shape}")
-    # print(f"Prediction range: {torch.min(prediction), torch.max(prediction)}")
-    prediction = prediction.squeeze()
-    depth = prediction
-    print(f"Depth range: {torch.min(depth), torch.max(depth)}")
-    predict_depth_np = depth.cpu().numpy()
-    predict_depth_np = clip_array_percentile(predict_depth_np, 5, 95)
-    print(f"Predict depth shape: {predict_depth_np.shape}")
-    if cnt == 1002:
-        break
+        prediction, _ = model(image * 2 - 1, test=True)
 
-    # Normalize the depth maps for visualization
-    predict_depth_vis = predict_depth_np
-    save_single_fig(predict_depth_vis, save_root, id)
+    depth = prediction
+    depth = depth.squeeze()
+    save_image(depth, os.path.join(save_root, f"{id + 1}.png"))
