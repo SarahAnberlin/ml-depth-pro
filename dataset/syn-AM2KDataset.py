@@ -72,17 +72,18 @@ def get_meta(meta_json):
     data_root = '/dataset/sharedir/research/AM-2K/'
     json_list = []
     with open(origin_meta_json, 'r') as f:
-        data = json.load(f)
-        image_path = data['img_path']
-        id = data['id']
-        dav2_path = os.path.join(data_root, 'AM2K-dav2', f'{id}.png')
-        depth_pro_path = os.path.join(data_root, 'AM2K-depth_pro', f'{id}.png')
-        json_list.append({
-            'id': id,
-            'img_path': image_path,
-            'dav2_path': dav2_path,
-            'depth_pro_path': depth_pro_path,
-        })
+        for line in f:
+            data = json.loads(line)
+            image_path = data['img_path']
+            id = data['id']
+            dav2_path = os.path.join(data_root, 'AM2K-dav2', f'{id}.png')
+            depth_pro_path = os.path.join(data_root, 'AM2K-depth_pro', f'{id}.png')
+            json_list.append({
+                'id': id,
+                'img_path': image_path,
+                'dav2_path': dav2_path,
+                'depth_pro_path': depth_pro_path,
+            })
 
     with open(meta_json, 'w') as f:
         for entry in json_list:
