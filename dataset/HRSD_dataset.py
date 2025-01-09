@@ -78,15 +78,17 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
     Returns:
         str: Path to the saved PNG file.
     """
-    with open(filepath, 'rb') as file:
-        colorBuf = file.read()
-    color = np.frombuffer(colorBuf, dtype=np.uint8)
-    image = np.reshape(color, (dsize[0], dsize[1], 4), 'C')
-    save_path = os.path.join(
-        os.path.split(filepath)[0],
-        os.path.split(filepath)[1].split('-')[0] + "Color.png"
-    )
-    cv2.imwrite(save_path, cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    print(f"Processing {filepath}")
+    if not os.path.exists(filepath):
+        with open(filepath, 'rb') as file:
+            colorBuf = file.read()
+        color = np.frombuffer(colorBuf, dtype=np.uint8)
+        image = np.reshape(color, (dsize[0], dsize[1], 4), 'C')
+        save_path = os.path.join(
+            os.path.split(filepath)[0],
+            os.path.split(filepath)[1].split('-')[0] + "Color.png"
+        )
+        cv2.imwrite(save_path, cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     return save_path
 
 
