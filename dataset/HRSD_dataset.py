@@ -67,36 +67,73 @@ class HRSD_Dataset(BaseDataset):
         return image, depth
 
 
-def transfer_raw_to_png(raw_path):
-    raw = rawpy.imread(raw_path)
-    rgb = raw.postprocess()
-    save_path = raw_path.replace('.raw', '.png')
-    cv2.imwrite(save_path, cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
+def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
+    """
+    Convert RAW file to PNG using custom buffer processing.
+
+    Args:
+        filepath (str): Path to the .raw file.
+        dsize (tuple): Dimensions (height, width) of the image.
+
+    Returns:
+        str: Path to the saved PNG file.
+    """
+    with open(filepath, 'rb') as file:
+        colorBuf = file.read()
+    color = np.frombuffer(colorBuf, dtype=np.uint8)
+    image = np.reshape(color, (dsize[0], dsize[1], 4), 'C')
+    save_path = os.path.join(
+        os.path.split(filepath)[0],
+        os.path.split(filepath)[1].split('-')[0] + "Color.png"
+    )
+    cv2.imwrite(save_path, cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     return save_path
 
 
-def process_file(file_path):
-    save_path = transfer_raw_to_png(file_path)
+def process_file(file_path, dsize=(720, 1280)):
+    """
+    Process a single .raw file to convert it to PNG.
+
+    Args:
+        file_path (str): Path to the .raw file.
+        dsize (tuple): Dimensions (height, width) of the image.
+
+    Returns:
+        str or None: Path to the saved PNG file if '-color' in name, else None.
+    """
+    save_path = convertColorRAW2PNG(file_path, dsize)
     if '-color' in save_path:
         return save_path
     return None
 
 
-def get_meta(meta_json, data_root, n_jobs=-1):
+def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
+    """
+    Process all .raw files in the given directory and convert them to PNG.
+
+    Args:
+        meta_json (str): Metadata file (unused in this implementation).
+        data_root (str): Root directory containing .raw files.
+        dsize (tuple): Dimensions (height, width) of the images.
+        n_jobs (int): Number of parallel jobs (-1 for all available CPUs).
+
+    Returns:
+        list: List of paths to the converted PNG files.
+    """
     raw_files = []
 
-    # 收集所有 .raw 文件路径
+    # Collect all .raw files
     for root, _, files in os.walk(data_root):
         for file in files:
             if file.endswith('.raw'):
                 raw_files.append(os.path.join(root, file))
 
-    # 使用 joblib 并行处理
+    # Use joblib for parallel processing
     results = Parallel(n_jobs=n_jobs)(
-        delayed(process_file)(file_path) for file_path in raw_files
+        delayed(process_file)(file_path, dsize) for file_path in raw_files
     )
 
-    # 过滤掉 None 值
+    # Filter out None values
     image_list = [result for result in results if result is not None]
 
     with open(meta_json, 'w') as f:
