@@ -84,7 +84,10 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
         with open(filepath, 'rb') as file:
             colorBuf = file.read()
         color = np.frombuffer(colorBuf, dtype=np.uint8)
-        image = np.reshape(color, (dsize[0], dsize[1], 4), 'C')
+        try:
+            image = np.reshape(color, (dsize[0], dsize[1], 4), 'C')
+        except ValueError:
+            return None
         save_path = os.path.join(
             os.path.split(filepath)[0],
             os.path.split(filepath)[1].split('-')[0] + "Color.png"
@@ -98,7 +101,10 @@ def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
     with open(filepath, 'rb') as file:
         depthBuf = file.read()
     depth = np.frombuffer(depthBuf, dtype=np.float32)
-    image = np.reshape(depth, dsize, 'C')
+    try:
+        image = np.reshape(depth, dsize, 'C')
+    except ValueError:
+        return
     f = 10003.814
     n = 0.15
     numerator = (-f * n)
@@ -121,9 +127,11 @@ def process_img(file_path, dsize=(720, 1280)):
         str or None: Path to the saved PNG file if '-color' in name, else None.
     """
     save_path = convertColorRAW2PNG(file_path, dsize)
-    if '-color' in save_path:
-        return save_path
-    return None
+    if save_path is not None:
+        if '-color' in save_path:
+            return save_path
+        else:
+            return None
 
 
 def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
