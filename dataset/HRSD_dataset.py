@@ -104,7 +104,7 @@ def get_meta(meta_json, data_root, n_jobs=-1):
         for image_path in image_list:
             cnt += 1
             type = 'train'
-            if 'validation' in image_path:
+            if 'val' in image_path:
                 type = 'validation'
             json.dump({
                 'id': cnt,
