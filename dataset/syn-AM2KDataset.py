@@ -77,7 +77,7 @@ def get_meta(meta_json):
             image_path = data['img_path']
             id = data['id']
             dav2_path = os.path.join(data_root, 'AM2K-dav2', f'{id}.png')
-            depth_pro_path = os.path.join(data_root, 'AM2K-depth_pro', f'{id}.png')
+            depth_pro_path = os.path.join(data_root, 'AM2K-depthpro', f'{id}.png')
             json_list.append({
                 'id': id,
                 'img_path': image_path,
