@@ -79,6 +79,7 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
         str: Path to the saved PNG file.
     """
     print(f"Processing {filepath}")
+    save_path = None
     if not os.path.exists(filepath):
         with open(filepath, 'rb') as file:
             colorBuf = file.read()
