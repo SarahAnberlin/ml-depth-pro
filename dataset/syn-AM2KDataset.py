@@ -10,6 +10,7 @@ from torchvision import transforms
 from dataset.BaseDataset import BaseDataset
 from dataset.utils import get_hdf5_array
 import cv2
+from torchvision.utils import save_image
 
 origin_meta_json = '/dataset/sharedir/research/AM-2K/meta_data.json'
 meta_json = '/dataset/sharedir/research/AM-2K/syn_meta_data.json'
@@ -97,5 +98,8 @@ if __name__ == "__main__":
     dataset = SYN_AM2KDataset()
     print(f"Dataset length: {len(dataset)}")
 
-    for id, image in enumerate(dataset):
-        print(f"Id: {id}, Image shape: {image.shape}")
+    for id, data in enumerate(dataset):
+        image, dav2_depth, depth_pro_depth = data
+        save_image(image, f'./vis/syn_am2k/{id}_image.png')
+        save_image(dav2_depth, f'./vis/syn_am2k/{id}_dav2_depth.png')
+        save_image(depth_pro_depth, f'./vis/syn_am2k/{id}_depth_pro_depth.png')
