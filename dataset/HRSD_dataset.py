@@ -118,7 +118,7 @@ def get_meta(meta_json, data_root, n_jobs=-1):
 if __name__ == "__main__":
 
     if not os.path.exists(meta_json):
-        get_meta(meta_json=meta_json)
+        get_meta(meta_json=meta_json, data_root=data_root)
 
     dataset = HRSD_Dataset()
     print(f"Dataset length: {len(dataset)}")
