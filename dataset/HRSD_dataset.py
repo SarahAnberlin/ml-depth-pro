@@ -16,6 +16,7 @@ from torchvision.utils import save_image
 import rawpy
 from joblib import Parallel, delayed
 
+raw_meta_json = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/HRSD/raw_meta_data.json'
 meta_json = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/GTA/meta_data.json'
 data_root = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/GTA/'
 
@@ -149,14 +150,29 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
     """
     raw_img_files = []
     raw_depth_files = []
-    # Collect all .raw files
-    for root, _, files in os.walk(data_root):
-        for file in files:
-            if file.endswith('.raw'):
-                if 'color.raw' in file:
-                    raw_img_files.append(os.path.join(root, file))
-                elif 'depth.raw' in file:
-                    raw_depth_files.append(os.path.join(root, file))
+    if not os.path.exists(raw_meta_json):
+
+        # Collect all .raw files
+        for root, _, files in os.walk(data_root):
+            for file in files:
+                if file.endswith('.raw'):
+                    if 'color.raw' in file:
+                        raw_img_files.append(os.path.join(root, file))
+        raw_depth_files = [file.replace('-color.raw', '-depth.raw') for file in raw_img_files]
+        with open(raw_meta_json, 'w') as f:
+            for id, (img_path, depth_path) in enumerate(zip(raw_img_files, raw_depth_files)):
+                json.dump({
+                    'id': id,
+                    'img_path': img_path,
+                    'depth_path': depth_path
+                }, f)
+                f.write('\n')
+
+    with open(raw_meta_json, 'r') as f:
+        for line in f:
+            entry = json.loads(line)
+            raw_img_files.append(entry["img_path"])
+            raw_depth_files.append(entry["depth_path"])
     print(f"Total images: {len(raw_img_files)} | Total depth: {len(raw_depth_files)}")
     # Use joblib for parallel processing
     results = Parallel(n_jobs=n_jobs)(
