@@ -162,7 +162,7 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
     print(f"Total images: {len(raw_img_files)} | Total depth: {len(raw_depth_files)}")
     print(f"Raw image files: {raw_img_files[:5]}")
     print(f"Raw depth files: {raw_depth_files[:5]}")
-    input("Press Enter to continue...")
+    # input("Press Enter to continue...")
     # Use joblib for parallel processing
     Parallel(n_jobs=n_jobs)(
         delayed(convertColorRAW2PNG)(file_path, dsize) for file_path in raw_img_files
