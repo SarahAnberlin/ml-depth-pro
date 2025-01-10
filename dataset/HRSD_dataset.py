@@ -110,14 +110,10 @@ def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
     n = 0.15
     numerator = (-f * n)
     denominator = (((n - f) * image) - n)
-    Abs_save_path = os.path.join(
-        os.path.split(filepath)[0],
-        os.path.split(filepath)[1].split('-')[0] + "DepthAbs.pfm"
-    )
-    cv2.imwrite(Abs_save_path, numerator / denominator)
+    print(f"Image range: {np.min(image)} - {np.max(image)}")
     Relative_save_path = os.path.join(
         os.path.split(filepath)[0],
-        os.path.split(filepath)[1].split('-')[0] + "DepthRelative.pfm"
+        os.path.split(filepath)[1].split('-')[0] + "Depth.png"
     )
     cv2.imwrite(Relative_save_path, image)
 
