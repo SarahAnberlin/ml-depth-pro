@@ -80,8 +80,12 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
         str: Path to the saved PNG file.
     """
     print(f"Processing {filepath}")
-    save_path = None
-    if not os.path.exists(filepath):
+    save_path = os.path.join(
+        os.path.split(filepath)[0],
+        os.path.split(filepath)[1].split('-')[0] + "Color.png"
+    )
+
+    if not os.path.exists(save_path):
         with open(filepath, 'rb') as file:
             colorBuf = file.read()
         color = np.frombuffer(colorBuf, dtype=np.uint8)
@@ -90,31 +94,30 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
         except ValueError:
             print(f"Bad color file: {filepath}")
             return None
-        save_path = os.path.join(
-            os.path.split(filepath)[0],
-            os.path.split(filepath)[1].split('-')[0] + "Color.png"
-        )
+
         cv2.imwrite(save_path, cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     return save_path
 
 
 def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
     print(f"Processing {filepath}")
-    with open(filepath, 'rb') as file:
-        depthBuf = file.read()
-    depth = np.frombuffer(depthBuf, dtype=np.float32)
-    try:
-        image = np.reshape(depth, dsize, 'C')
-    except ValueError:
-        print(f"Bad depth file: {filepath}")
-        return
-    image = (image - np.min(image)) / (np.max(image) - np.min(image))
-    image = (image * 255).astype(np.uint8)
     Relative_save_path = os.path.join(
         os.path.split(filepath)[0],
         os.path.split(filepath)[1].split('-')[0] + "Depth.png"
     )
-    cv2.imwrite(Relative_save_path, image)
+    if not os.path.exists(Relative_save_path):
+        with open(filepath, 'rb') as file:
+            depthBuf = file.read()
+        depth = np.frombuffer(depthBuf, dtype=np.float32)
+        try:
+            image = np.reshape(depth, dsize, 'C')
+        except ValueError:
+            print(f"Bad depth file: {filepath}")
+            return
+        image = (image - np.min(image)) / (np.max(image) - np.min(image))
+        image = (image * 255).astype(np.uint8)
+
+        cv2.imwrite(Relative_save_path, image)
 
 
 def process_img(file_path, dsize=(720, 1280)):
