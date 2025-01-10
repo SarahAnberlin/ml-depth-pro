@@ -1,4 +1,4 @@
-Name: "hrsd-dataset-eda"
+Name: "hrsd-eda"
 Image: "harbor.smoa.cc/fayez/cuda121conda:runtime"
 Command: "source ~/.bashrc; conda activate DIR; cd ~/test/depth-pro/main; 
 export PYTHONPATH=. ; python dataset/HRSD_dataset.py"
