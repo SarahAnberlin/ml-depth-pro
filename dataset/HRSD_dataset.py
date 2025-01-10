@@ -133,7 +133,7 @@ def process_img(file_path, dsize=(720, 1280)):
     """
     save_path = convertColorRAW2PNG(file_path, dsize)
     if save_path is not None:
-        if '-color' in save_path:
+        if 'Color' in save_path:
             return save_path
         else:
             return None
