@@ -120,25 +120,6 @@ def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
         cv2.imwrite(Relative_save_path, image)
 
 
-def process_img(file_path, dsize=(720, 1280)):
-    """
-    Process a single .raw file to convert it to PNG.
-
-    Args:
-        file_path (str): Path to the .raw file.
-        dsize (tuple): Dimensions (height, width) of the image.
-
-    Returns:
-        str or None: Path to the saved PNG file if '-color' in name, else None.
-    """
-    save_path = convertColorRAW2PNG(file_path, dsize)
-    if save_path is not None:
-        if 'Color' in save_path:
-            return save_path
-        else:
-            return None
-
-
 def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
     """
     Process all .raw files in the given directory and convert them to PNG.
@@ -184,7 +165,7 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
     input("Press Enter to continue...")
     # Use joblib for parallel processing
     Parallel(n_jobs=n_jobs)(
-        delayed(process_img)(file_path, dsize) for file_path in raw_img_files
+        delayed(convertColorRAW2PNG)(file_path, dsize) for file_path in raw_img_files
     )
     Parallel(n_jobs=n_jobs)(
         delayed(convertDepthRAW2PNG)(file_path, dsize) for file_path in raw_depth_files
