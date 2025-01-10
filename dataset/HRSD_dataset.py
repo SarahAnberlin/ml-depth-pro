@@ -194,6 +194,7 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
         for file in files:
             if file.endswith('.png'):
                 file_path = os.path.join(root, file)
+                print(f"Processing {file_path}")
                 if 'color' in file_path.lower():
                     depth_path = file_path.replace('Color', 'Depth')
                     if os.path.exists(depth_path):
@@ -226,7 +227,6 @@ if __name__ == "__main__":
     os.makedirs('./vis/syn_am2k', exist_ok=True)
     for id, data in enumerate(dataset):
         image, dav2_depth, depth_pro_depth = data
-
         save_image(image, f'./vis/syn_am2k/{id}_image.png')
         save_image(dav2_depth, f'./vis/syn_am2k/{id}_dav2_depth.png')
         save_image(depth_pro_depth, f'./vis/syn_am2k/{id}_depth_pro_depth.png')
