@@ -226,7 +226,7 @@ def validate_dataset(dataset, n_jobs=-1):
     Returns:
         None
     """
-    results = Parallel(n_jobs=n_jobs)(
+    Parallel(n_jobs=n_jobs)(
         delayed(check_data)(idx, data) for idx, data in enumerate(dataset)
     )
 
