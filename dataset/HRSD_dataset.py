@@ -85,7 +85,7 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
         os.path.split(filepath)[1].split('-')[0] + "Color.png"
     )
 
-    if not os.path.exists(save_path):
+    if not os.path.exists(save_path) or cv2.imread(save_path) is None:
         with open(filepath, 'rb') as file:
             colorBuf = file.read()
         color = np.frombuffer(colorBuf, dtype=np.uint8)
@@ -105,7 +105,7 @@ def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
         os.path.split(filepath)[0],
         os.path.split(filepath)[1].split('-')[0] + "Depth.png"
     )
-    if not os.path.exists(Relative_save_path):
+    if not os.path.exists(Relative_save_path) or cv2.imread(Relative_save_path) is None:
         with open(filepath, 'rb') as file:
             depthBuf = file.read()
         depth = np.frombuffer(depthBuf, dtype=np.float32)
