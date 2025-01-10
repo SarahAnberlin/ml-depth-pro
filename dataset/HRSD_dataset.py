@@ -88,6 +88,7 @@ def convertColorRAW2PNG(filepath, dsize=(720, 1280)):
         try:
             image = np.reshape(color, (dsize[0], dsize[1], 4), 'C')
         except ValueError:
+            print(f"Bad color file: {filepath}")
             return None
         save_path = os.path.join(
             os.path.split(filepath)[0],
@@ -105,6 +106,7 @@ def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
     try:
         image = np.reshape(depth, dsize, 'C')
     except ValueError:
+        print(f"Bad depth file: {filepath}")
         return
     f = 10003.814
     n = 0.15
