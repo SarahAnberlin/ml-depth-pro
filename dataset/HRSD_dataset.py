@@ -196,7 +196,7 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
                 'id': id,
                 'type': type,
                 'img_path': image_path,
-                'depth_path': image_path.replace('-color', '-depth')
+                'depth_path': image_path.replace('Color', 'Depth')
             }, f)
             f.write('\n')
 
