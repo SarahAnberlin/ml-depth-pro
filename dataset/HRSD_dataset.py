@@ -242,5 +242,5 @@ if __name__ == "__main__":
 
     dataset = HRSD_Dataset()
     print(f"Dataset length: {len(dataset)}")
-
+    input()
     validate_dataset(dataset)
