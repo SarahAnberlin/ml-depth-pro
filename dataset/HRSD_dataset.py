@@ -110,10 +110,16 @@ def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
     n = 0.15
     numerator = (-f * n)
     denominator = (((n - f) * image) - n)
-    cv2.imwrite(os.path.join(os.path.split(filepath)[0], os.path.split(filepath)[1].split('-')[0] + "DepthReal.pfm"),
-                numerator / denominator)
-    cv2.imwrite(
-        os.path.join(os.path.split(filepath)[0], os.path.split(filepath)[1].split('-')[0] + "DepthRelative.pfm"), image)
+    Abs_save_path = os.path.join(
+        os.path.split(filepath)[0],
+        os.path.split(filepath)[1].split('-')[0] + "DepthAbs.pfm"
+    )
+    cv2.imwrite(Abs_save_path, numerator / denominator)
+    Relative_save_path = os.path.join(
+        os.path.split(filepath)[0],
+        os.path.split(filepath)[1].split('-')[0] + "DepthRelative.pfm"
+    )
+    cv2.imwrite(Relative_save_path, image)
 
 
 def process_img(file_path, dsize=(720, 1280)):
@@ -156,8 +162,9 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
         for root, _, files in os.walk(data_root):
             for file in files:
                 if file.endswith('.raw'):
-                    if 'color.raw' in file:
-                        raw_img_files.append(os.path.join(root, file))
+                    file_path = os.path.join(root, file)
+                    if '-color.raw' in file_path:
+                        raw_img_files.append(file_path)
         raw_depth_files = [file.replace('-color.raw', '-depth.raw') for file in raw_img_files]
         with open(raw_meta_json, 'w') as f:
             for id, (img_path, depth_path) in enumerate(zip(raw_img_files, raw_depth_files)):
@@ -174,6 +181,9 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
             raw_img_files.append(entry["img_path"])
             raw_depth_files.append(entry["depth_path"])
     print(f"Total images: {len(raw_img_files)} | Total depth: {len(raw_depth_files)}")
+    print(f"Raw image files: {raw_img_files[:5]}")
+    print(f"Raw depth files: {raw_depth_files[:5]}")
+    input("Press Enter to continue...")
     # Use joblib for parallel processing
     results = Parallel(n_jobs=n_jobs)(
         delayed(process_img)(file_path, dsize) for file_path in raw_img_files
