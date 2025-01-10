@@ -182,8 +182,9 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
                 if 'color' in file_path.lower():
                     depth_path = file_path.replace('Color', 'Depth')
                     if os.path.exists(depth_path):
-                        png_img.append(file_path)
-                        png_depth.append(depth_path)
+                        if cv2.imread(file_path) is not None and cv2.imread(depth_path) is not None:
+                            png_img.append(file_path)
+                            png_depth.append(depth_path)
 
     with open(meta_json, 'w') as f:
 
