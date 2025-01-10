@@ -187,22 +187,27 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
         delayed(convertDepthRAW2PNG)(file_path, dsize) for file_path in raw_depth_files
     )
 
+    png_img = []
+    png_depth = []
     # Filter out None values
     for root, _, files in os.walk(data_root):
         for file in files:
             if file.endswith('.png'):
                 file_path = os.path.join(root, file)
-                if
+                if 'color' in file_path.lower():
+                    depth_path = file_path.replace('Color', 'Depth')
+                    if os.path.exists(depth_path):
+                        png_img.append(file_path)
+                        png_depth.append(depth_path)
 
     with open(meta_json, 'w') as f:
-        cnt = 0
-        for image_path in image_list:
-            cnt += 1
+
+        for id, (image_path, depth_path) in enumerate(zip(png_img, png_depth)):
             type = 'train'
             if 'val' in image_path:
                 type = 'validation'
             json.dump({
-                'id': cnt,
+                'id': id,
                 'type': type,
                 'img_path': image_path,
                 'depth_path': image_path.replace('-color', '-depth')
