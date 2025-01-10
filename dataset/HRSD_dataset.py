@@ -186,9 +186,9 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
     results = Parallel(n_jobs=n_jobs)(
         delayed(process_img)(file_path, dsize) for file_path in raw_img_files
     )
-    Parallel(n_jobs=n_jobs)(
-        delayed(convertDepthRAW2PNG)(file_path, dsize) for file_path in raw_depth_files
-    )
+    # Parallel(n_jobs=n_jobs)(
+    #     delayed(convertDepthRAW2PNG)(file_path, dsize) for file_path in raw_depth_files
+    # )
 
     # Filter out None values
     image_list = [result for result in results if result is not None]
