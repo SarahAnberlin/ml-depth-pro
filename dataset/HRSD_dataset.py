@@ -108,11 +108,8 @@ def convertDepthRAW2PNG(filepath, dsize=(720, 1280)):
     except ValueError:
         print(f"Bad depth file: {filepath}")
         return
-    f = 10003.814
-    n = 0.15
-    numerator = (-f * n)
-    denominator = (((n - f) * image) - n)
-    print(f"Image range: {np.min(image)} - {np.max(image)}")
+    image = (image - np.min(image)) / (np.max(image) - np.min(image))
+    image = (image * 255).astype(np.uint8)
     Relative_save_path = os.path.join(
         os.path.split(filepath)[0],
         os.path.split(filepath)[1].split('-')[0] + "Depth.png"
@@ -183,15 +180,19 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
     print(f"Raw depth files: {raw_depth_files[:5]}")
     input("Press Enter to continue...")
     # Use joblib for parallel processing
-    results = Parallel(n_jobs=n_jobs)(
+    Parallel(n_jobs=n_jobs)(
         delayed(process_img)(file_path, dsize) for file_path in raw_img_files
     )
-    # Parallel(n_jobs=n_jobs)(
-    #     delayed(convertDepthRAW2PNG)(file_path, dsize) for file_path in raw_depth_files
-    # )
+    Parallel(n_jobs=n_jobs)(
+        delayed(convertDepthRAW2PNG)(file_path, dsize) for file_path in raw_depth_files
+    )
 
     # Filter out None values
-    image_list = [result for result in results if result is not None]
+    for root, _, files in os.walk(data_root):
+        for file in files:
+            if file.endswith('.png'):
+                file_path = os.path.join(root, file)
+                if
 
     with open(meta_json, 'w') as f:
         cnt = 0
