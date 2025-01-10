@@ -227,7 +227,6 @@ if __name__ == "__main__":
     dataset = HRSD_Dataset()
     print(f"Dataset length: {len(dataset)}")
 
-    os.makedirs('./vis/syn_am2k', exist_ok=True)
     for id, data in enumerate(dataset):
         image, depth = data
         print(f"Image shape: {image.shape} | Depth shape: {depth.shape}")
