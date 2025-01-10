@@ -16,8 +16,8 @@ from torchvision.utils import save_image
 import rawpy
 from joblib import Parallel, delayed
 
-raw_meta_json = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/HRSD/raw_meta_data.json'
-meta_json = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/GTA/meta_data.json'
+raw_meta_json = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/raw_meta_data.json'
+meta_json = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/meta_data.json'
 data_root = '/dataset/sharedir/research/HRSD/MonoDepth_HRSD_GTA/GTA/'
 
 
