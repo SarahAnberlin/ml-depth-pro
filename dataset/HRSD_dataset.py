@@ -200,6 +200,41 @@ def get_meta(meta_json, data_root, dsize=(720, 1280), n_jobs=-1):
             f.write('\n')
 
 
+def check_data(index, data):
+    """
+    Function to validate a single dataset entry.
+
+    Args:
+        index (int): Index of the data.
+        data (tuple): A tuple containing the image and depth data.
+
+    Returns:
+        str: Validation result as a formatted string.
+    """
+    image, depth = data
+    return f"ID: {index} | Image shape: {image.shape} | Depth shape: {depth.shape}"
+
+
+def validate_dataset(dataset, n_jobs=-1):
+    """
+    Validate the dataset using multiple threads.
+
+    Args:
+        dataset (iterable): The dataset containing (image, depth) pairs.
+        n_jobs (int): Number of threads to use (-1 for all available).
+
+    Returns:
+        None
+    """
+    results = Parallel(n_jobs=n_jobs)(
+        delayed(check_data)(idx, data) for idx, data in enumerate(dataset)
+    )
+
+    # Print all results
+    for result in results:
+        print(result)
+
+
 if __name__ == "__main__":
 
     if not os.path.exists(meta_json):
@@ -208,6 +243,4 @@ if __name__ == "__main__":
     dataset = HRSD_Dataset()
     print(f"Dataset length: {len(dataset)}")
 
-    for id, data in enumerate(dataset):
-        image, depth = data
-        print(f"Image shape: {image.shape} | Depth shape: {depth.shape}")
+    validate_dataset(dataset)
