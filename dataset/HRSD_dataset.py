@@ -212,7 +212,7 @@ def check_data(index, data):
         str: Validation result as a formatted string.
     """
     image, depth = data
-    return f"ID: {index} | Image shape: {image.shape} | Depth shape: {depth.shape}"
+    print(f"ID: {index} | Image shape: {image.shape} | Depth shape: {depth.shape}")
 
 
 def validate_dataset(dataset, n_jobs=-1):
@@ -229,10 +229,6 @@ def validate_dataset(dataset, n_jobs=-1):
     results = Parallel(n_jobs=n_jobs)(
         delayed(check_data)(idx, data) for idx, data in enumerate(dataset)
     )
-
-    # Print all results
-    for result in results:
-        print(result)
 
 
 if __name__ == "__main__":
